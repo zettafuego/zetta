@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZETTAFUEGO — Eduardo Sánchez</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #050505;
+            --bg2: #0d0d0d;
+            --bg3: #141414;
+            --bg4: #1a1a1a;
+            --red: #e53e3e;
+            --red2: #c53030;
+            --red3: #9b2c2c;
+            --orange: #dd6b20;
+            --text: #f7f7f7;
+            --text2: #a0a0a0;
+            --text3: #555;
+            --border: #1e1e1e;
+            --border2: #2a2a2a;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--red3); border-radius: 2px; }
+
+        /* NAV */
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5,5,5,0.8);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid transparent;
+            transition: all 0.4s ease;
+        }
+        .nav.scrolled { padding: 0.8rem 2rem; border-bottom-color: var(--border); background: rgba(5,5,5,0.95); }
+
+        .nav-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .nav-brand em { color: var(--red); font-style: normal; }
+
+        .nav-menu { display: flex; gap: 2rem; list-style: none; }
+        .nav-menu a {
+            color: var(--text3);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+            position: relative;
+        }
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -6px; left: 0;
+            width: 0; height: 1.5px;
+            background: var(--red);
+            transition: width 0.3s;
+        }
+        .nav-menu a:hover { color: var(--text); }
+        .nav-menu a:hover::after { width: 100%; }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .nav-toggle span {
+            display: block;
+            width: 22px; height: 2px;
+            background: var(--text);
+            transition: all 0.3s;
+        }
+        .nav-toggle.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .nav-toggle.open span:nth-child(2) { opacity: 0; }
+        .nav-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(5,5,5,0.98);
+            backdrop-filter: blur(30px);
+            z-index: 999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2.5rem;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .mobile-nav.show { display: flex; opacity: 1; }
+        .mobile-nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        .mobile-nav a:hover { color: var(--red); }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding: 8rem 2rem 4rem;
+            overflow: hidden;
+        }
+        .hero-glow {
+            position: absolute;
+            width: 700px; height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(229,62,62,0.1) 0%, transparent 70%);
+            top: 40%; left: 55%;
+            transform: translate(-50%,-50%);
+            animation: glowPulse 5s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes glowPulse {
+            0%,100% { opacity:0.4; transform:translate(-50%,-50%) scale(1); }
+            50% { opacity:0.7; transform:translate(-50%,-50%) scale(1.08); }
+        }
+
+        .hero-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-left { animation: fadeUp 1s ease forwards; opacity: 0; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+
+        .hero-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.35rem 1rem;
+            background: rgba(229,62,62,0.08);
+            border: 1px solid rgba(229,62,62,0.25);
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 1.8rem;
+        }
+        .hero-status .pulse-dot {
+            width: 7px; height: 7px;
+            background: var(--red);
+            border-radius: 50%;
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity:1; transform:scale(1); }
+            50% { opacity:0.3; transform:scale(0.8); }
+        }
+
+        /* ===== MORPH TEXT ===== */
+        .morph-heading {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+            min-height: 2.2em;
+        }
+
+        .morph-line {
+            display: block;
+            position: relative;
+        }
+
+        .morph-char {
+            display: inline-block;
+            position: relative;
+            color: var(--text);
+            transition: color 0.4s ease, transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .morph-char.changing {
+            animation: charMorph 0.6s ease forwards;
+        }
+
+        @keyframes charMorph {
+            0% {
+                color: var(--text);
+                transform: translateY(0) scale(1);
+                text-shadow: none;
+                opacity: 1;
+            }
+            25% {
+                color: var(--red);
+                transform: translateY(-12px) scale(1.2) rotateX(90deg);
+                text-shadow: 0 0 30px rgba(229,62,62,0.6), 0 0 60px rgba(229,62,62,0.3);
+                opacity: 0.7;
+            }
+            50% {
+                color: var(--orange);
+                transform: translateY(-18px) scale(0.8) rotateX(180deg);
+                text-shadow: 0 0 40px rgba(221,107,32,0.5), 0 0 80px rgba(221,107,32,0.2);
+                opacity: 0.3;
+            }
+            75% {
+                color: var(--red);
+                transform: translateY(4px) scale(1.05);
+                text-shadow: 0 0 20px rgba(229,62,62,0.4);
+                opacity: 0.6;
+            }
+            100% {
+                color: var(--text);
+                transform: translateY(0) scale(1);
+                text-shadow: none;
+                opacity: 1;
+            }
+        }
+
+        .morph-char.accent-char {
+            background: linear-gradient(135deg, var(--red), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .morph-char.accent-char.changing {
+            -webkit-text-fill-color: var(--red);
+            background: none;
+            animation: charMorphAccent 0.6s ease forwards;
+        }
+
+        @keyframes charMorphAccent {
+            0% {
+                -webkit-text-fill-color: var(--red);
+                background: none;
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            25% {
+                -webkit-text-fill-color: var(--orange);
+                transform: translateY(-12px) scale(1.2);
+                text-shadow: 0 0 30px rgba(221,107,32,0.6);
+                opacity: 0.7;
+            }
+            50% {
+                -webkit-text-fill-color: #fff;
+                transform: translateY(-18px) scale(0.8);
+                text-shadow: 0 0 40px rgba(255,255,255,0.5);
+                opacity: 0.3;
+            }
+            75% {
+                -webkit-text-fill-color: var(--red);
+                transform: translateY(4px) scale(1.05);
+                opacity: 0.6;
+            }
+            100% {
+                -webkit-text-fill-color: var(--red);
+                background: linear-gradient(135deg, var(--red), var(--orange));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .morph-char.new-char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px) scale(0.5);
+            animation: charAppear 0.4s ease forwards;
+        }
+
+        @keyframes charAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-4px) scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .morph-char.space-char {
+            width: 0.3em;
+            display: inline-block;
+        }
+
+        /* Fire particles on text */
+        .morph-text-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .morph-text-wrap .fire-overlay {
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(to top, rgba(229,62,62,0.15), transparent);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .morph-text-wrap.burning .fire-overlay {
+            opacity: 1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.05rem;
+            color: var(--text2);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 1.5s forwards;
+        }
+
+        .hero-desc {
+            font-size: 0.95rem;
+            color: var(--text2);
+            max-width: 440px;
+            line-height: 1.85;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 2s forwards;
+        }
+
+        .hero-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 2.3s forwards;
+        }
+        .hero-tag-item {
+            padding: 0.3rem 0.8rem;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.72rem;
+            color: var(--text2);
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+        .hero-tag-item:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 2.6s forwards;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.9rem 2rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-radius: 10px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-fill {
+            background: linear-gradient(135deg, var(--red), var(--red2));
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-fill::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+            transition: left 0.5s;
+        }
+        .btn-fill:hover::before { left: 100%; }
+        .btn-fill:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(229,62,62,0.35); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border2);
+        }
+        .btn-ghost:hover { border-color: var(--red); color: var(--red); transform: translateY(-3px); }
+
+        .hero-right { animation: fadeUp 1s ease 0.35s forwards; opacity: 0; display: flex; justify-content: center; }
+        .hero-img-wrap { position: relative; width: 100%; max-width: 480px; }
+        .hero-img-wrap::before {
+            content: '';
+            position: absolute;
+            top: -16px; right: -16px;
+            width: 100%; height: 100%;
+            border: 2px solid rgba(229,62,62,0.25);
+            border-radius: 20px;
+            z-index: -1;
+        }
+        .hero-img-wrap img {
+            width: 100%;
+            border-radius: 20px;
+            display: block;
+            filter: contrast(1.05) brightness(0.92);
+            transition: transform 0.5s ease;
+        }
+        .hero-img-wrap:hover img { transform: scale(1.02); }
+
+        .hero-float-card {
+            position: absolute;
+            bottom: -18px; left: -18px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1rem 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            animation: floatCard 3.5s ease-in-out infinite;
+        }
+        @keyframes floatCard {
+            0%,100% { transform:translateY(0); }
+            50% { transform:translateY(-10px); }
+        }
+        .float-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--red), var(--orange));
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .float-text { font-size: 0.72rem; color: var(--text2); line-height: 1.4; }
+        .float-text strong { display: block; color: var(--text); font-size: 0.95rem; }
+
+        /* PARTICLES */
+        .particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            border-radius: 50%;
+            opacity: 0;
+            animation: rise linear infinite;
+        }
+        @keyframes rise {
+            0% { opacity: 0; transform: translateY(0) scale(1); }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.15; }
+            100% { opacity: 0; transform: translateY(-220px) scale(0); }
+        }
+
+        /* STATS */
+        .stats {
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg2);
+        }
+        .stats-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+        .stat { text-align: center; padding: 1rem; position: relative; }
+        .stat:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 15%;
+            height: 70%;
+            width: 1px;
+            background: var(--border);
+        }
+        .stat-num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--red), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            font-size: 0.72rem;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0.3rem;
+        }
+
+        /* SECTION COMMON */
+        section { padding: 6rem 2rem; }
+        .section-head { text-align: center; max-width: 600px; margin: 0 auto 3.5rem; }
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 1rem;
+        }
+        .section-tag::before, .section-tag::after {
+            content: '';
+            width: 28px; height: 1px;
+            background: var(--red3);
+        }
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            letter-spacing: -0.5px;
+        }
+        .section-desc { color: var(--text2); font-size: 0.95rem; line-height: 1.8; }
+
+        /* ABOUT / BIOGRAFIA */
+        .about-section { background: var(--bg2); }
+        .about-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 4rem;
+            align-items: start;
+        }
+        .about-img-col { position: relative; }
+        .about-img-col img {
+            width: 100%;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            display: block;
+        }
+        .about-img-accent {
+            position: absolute;
+            bottom: -12px;
+            right: -12px;
+            width: 120px;
+            height: 120px;
+            border: 2px solid var(--red);
+            border-radius: 14px;
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        .about-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        .about-role {
+            color: var(--red);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+        .about-location {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: var(--text3);
+            margin-bottom: 2rem;
+        }
+        .about-text {
+            color: var(--text2);
+            font-size: 0.92rem;
+            line-height: 1.9;
+            margin-bottom: 1.5rem;
+        }
+        .about-highlights {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .about-highlight {
+            padding: 1rem 1.2rem;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        .about-highlight:hover {
+            border-color: var(--border2);
+            transform: translateY(-2px);
+        }
+        .about-highlight .ah-icon {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        .about-highlight h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        .about-highlight p {
+            font-size: 0.78rem;
+            color: var(--text3);
+            line-height: 1.6;
+        }
+
+        /* CAROUSEL */
+        .carousel-section { background: var(--bg); }
+        .carousel-wrap { max-width: 1300px; margin: 0 auto; }
+        .carousel-viewport {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        .carousel-track { display: flex; transition: transform 0.65s cubic-bezier(0.22,1,0.36,1); }
+        .c-slide {
+            min-width: 100%;
+            position: relative;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+        }
+        .c-slide img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .c-slide:hover img { transform: scale(1.04); }
+        .c-slide-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2.5rem 2rem 2rem;
+        }
+        .c-slide-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 600; margin-bottom: 0.3rem; }
+        .c-slide-sub { color: var(--text2); font-size: 0.85rem; margin-bottom: 0.8rem; }
+        .c-slide-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(229,62,62,0.15);
+            border: 1px solid rgba(229,62,62,0.35);
+            border-radius: 100px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--red);
+            width: fit-content;
+        }
+
+        .c-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .c-btn {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bg3);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .c-btn:hover { border-color: var(--red); background: rgba(229,62,62,0.1); color: var(--red); transform: scale(1.1); }
+        .c-dots { display: flex; gap: 7px; }
+        .c-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--border2);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .c-dot.active { width: 30px; border-radius: 4px; background: var(--red); }
+        .c-counter { font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; color: var(--text3); letter-spacing: 2px; }
+        .c-counter .cur { color: var(--text); font-weight: 700; font-size: 1.15rem; }
+
+        .c-thumbs {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+        .c-thumbs::-webkit-scrollbar { height: 0; }
+        .c-thumb {
+            min-width: 110px; height: 72px;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            opacity: 0.4;
+            flex-shrink: 0;
+        }
+        .c-thumb.active { border-color: var(--red); opacity: 1; }
+        .c-thumb:hover { opacity: 0.7; }
+        .c-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* SERVICES */
+        .services-section { background: var(--bg2); }
+        .services-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .svc-card {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .svc-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--red), var(--orange));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .svc-card:hover { border-color: var(--border2); transform: translateY(-5px); background: var(--bg4); }
+        .svc-card:hover::before { opacity: 1; }
+        .svc-icon {
+            width: 54px; height: 54px;
+            border-radius: 13px;
+            background: rgba(229,62,62,0.08);
+            border: 1px solid rgba(229,62,62,0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+        }
+        .svc-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.7rem; }
+        .svc-card p { color: var(--text2); font-size: 0.88rem; line-height: 1.75; margin-bottom: 1.2rem; }
+        .svc-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .svc-tag {
+            padding: 0.2rem 0.6rem;
+            background: rgba(229,62,62,0.06);
+            border: 1px solid rgba(229,62,62,0.15);
+            border-radius: 4px;
+            font-size: 0.68rem;
+            color: var(--text3);
+        }
+
+        /* GALLERY */
+        .gallery-section { background: var(--bg); }
+        .gallery-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 240px);
+            gap: 1rem;
+        }
+        .gal-item {
+            border-radius: 14px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: all 0.4s ease;
+        }
+        .gal-item:hover { border-color: var(--red); transform: scale(1.025); z-index: 2; }
+        .gal-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+        .gal-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .gal-item:hover img { transform: scale(1.08); }
+        .gal-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: flex-end;
+            padding: 1.5rem;
+        }
+        .gal-item:hover .gal-overlay { opacity: 1; }
+        .gal-overlay span { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.95rem; }
+
+        /* LIGHTBOX */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.96);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(12px);
+        }
+        .lightbox.show { display: flex; opacity: 1; }
+        .lightbox img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 12px; }
+        .lb-close {
+            position: absolute;
+            top: 2rem; right: 2rem;
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--border2);
+            background: var(--bg3);
+            color: var(--text);
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .lb-close:hover { border-color: var(--red); color: var(--red); }
+
+        /* CONTACT */
+        .contact-section { background: var(--bg2); }
+        .contact-wrap { max-width: 750px; margin: 0 auto; }
+        .contact-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .fg { display: flex; flex-direction: column; gap: 0.5rem; }
+        .fg.full { grid-column: span 2; }
+        .fg label { font-size: 0.75rem; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); }
+        .fg input, .fg textarea {
+            padding: 0.85rem 1rem;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .fg input:focus, .fg textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(229,62,62,0.08); }
+        .fg textarea { resize: vertical; min-height: 130px; }
+        .form-submit { grid-column: span 2; display: flex; justify-content: center; }
+
+        /* FOOTER */
+        footer { padding: 2.5rem 2rem; border-top: 1px solid var(--border); background: var(--bg); }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .footer-brand { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; }
+        .footer-brand em { color: var(--red); font-style: normal; }
+        .footer-copy { color: var(--text3); font-size: 0.8rem; }
+        .footer-socials { display: flex; gap: 0.6rem; }
+        .soc-link {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg3);
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .soc-link:hover { border-color: var(--red); color: var(--red); transform: translateY(-2px); }
+
+        /* REVEAL */
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.22,1,0.36,1); }
+        .reveal.vis { opacity: 1; transform: translateY(0); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 3rem; }
+            .hero-desc, .hero-tags, .hero-subtitle { margin-left: auto; margin-right: auto; }
+            .hero-ctas { justify-content: center; }
+            .hero-right { order: -1; }
+            .hero-img-wrap { max-width: 400px; }
+            .about-inner { grid-template-columns: 1fr; gap: 3rem; }
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 200px); }
+            .gal-item:nth-child(1) { grid-column: span 2; grid-row: span 1; }
+        }
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .nav-toggle { display: flex; }
+            section { padding: 4rem 1.5rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat:nth-child(2)::after { display: none; }
+            .about-highlights { grid-template-columns: 1fr; }
+            .services-grid { grid-template-columns: 1fr; }
+            .contact-form { grid-template-columns: 1fr; }
+            .fg.full, .form-submit { grid-column: span 1; }
+            .c-slide-overlay { padding: 1.5rem; }
+            .c-slide-title { font-size: 1.2rem; }
+            .c-thumb { min-width: 80px; height: 55px; }
+            .footer-inner { flex-direction: column; text-align: center; }
+            .morph-heading { font-size: clamp(2rem, 8vw, 3.5rem); }
+        }
+        @media (max-width: 480px) {
+            .hero { padding: 5rem 1rem 3rem; }
+            .hero-float-card { display: none; }
+            .stat-num { font-size: 2rem; }
+            .gallery-grid { grid-template-columns: 1fr; grid-template-rows: repeat(5, 200px); }
+            .gal-item:nth-child(1) { grid-column: span 1; }
+            .c-btn { width: 42px; height: 42px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="nav" id="nav">
+        <a href="#" class="nav-brand">ZETTA<em>FUEGO</em></a>
+        <ul class="nav-menu">
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#sobre-mi">Sobre Mí</a></li>
+            <li><a href="#trabajos">Trabajos</a></li>
+            <li><a href="#servicios">Servicios</a></li>
+            <li><a href="#galeria">Galería</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+        <button class="nav-toggle" id="navToggle" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <div class="mobile-nav" id="mobileNav">
+        <a href="#inicio" onclick="closeMob()">Inicio</a>
+        <a href="#sobre-mi" onclick="closeMob()">Sobre Mí</a>
+        <a href="#trabajos" onclick="closeMob()">Trabajos</a>
+        <a href="#servicios" onclick="closeMob()">Servicios</a>
+        <a href="#galeria" onclick="closeMob()">Galería</a>
+        <a href="#contacto" onclick="closeMob()">Contacto</a>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+        <div class="hero-glow"></div>
+        <div class="particles" id="particles"></div>
+        <div class="hero-inner">
+            <div class="hero-left">
+                <div class="hero-status">
+                    <span class="pulse-dot"></span>
+                    Artista Multidisciplinario
+                </div>
+
+                <div class="morph-heading" id="morphHeading">
+                    <span class="morph-line" id="morphLine1"></span>
+                </div>
+
+                <p class="hero-subtitle">Artista Plástico · Tatuador · Ingeniero · Developer</p>
+                <p class="hero-desc">Explorando la intersección entre arte, tecnología y narrativa contemporánea desde Lima, Perú.</p>
+                <div class="hero-tags">
+                    <span class="hero-tag-item">🎨 Pintura</span>
+                    <span class="hero-tag-item">🗿 Escultura</span>
+                    <span class="hero-tag-item">🖊️ Tatuaje</span>
+                    <span class="hero-tag-item">💻 Python</span>
+                    <span class="hero-tag-item">🎮 Videojuegos</span>
+                    <span class="hero-tag-item">⛏️ Ingeniería</span>
+                </div>
+                <div class="hero-ctas">
+                    <a href="#trabajos" class="btn btn-fill">
+                        Ver Trabajos
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                    <a href="#contacto" class="btn btn-ghost">Contacto</a>
+                </div>
+            </div>
+            <div class="hero-right">
+                <div class="hero-img-wrap">
+                    <img src="zettafuego/edu.png
+                    " alt="Eduardo Sánchez - Artista">
+                    <div class="hero-float-card">
+                        <div class="float-icon"></div>
+                        <div class="float-text">
+                            <strong>+10 Años</strong>
+                            Tatuando
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stats-grid">
+            <div class="stat reveal">
+                <div class="stat-num" data-target="10">0</div>
+                <div class="stat-label">Años Tatuando</div>
+            </div>
+            <div class="stat reveal">
+                <div class="stat-num" data-target="500">0</div>
+                <div class="stat-label">Proyectos Artísticos</div>
+            </div>
+            <div class="stat reveal">
+                <div class="stat-num" data-target="6">0</div>
+                <div class="stat-label">Disciplinas</div>
+            </div>
+            <div class="stat reveal">
+                <div class="stat-num" data-target="1">0</div>
+                <div class="stat-label">Premio Expo Tattoo</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABOUT -->
+    <section class="about-section" id="sobre-mi">
+        <div class="section-head reveal">
+            <div class="section-tag">Biografía</div>
+            <h2 class="section-title">Sobre Mí</h2>
+        </div>
+        <div class="about-inner">
+            <div class="about-img-col reveal">
+                <img src="zettafuego/1.jpg" alt="Eduardo Sánchez">
+                <div class="about-img-accent"></div>
+            </div>
+            <div class="about-content reveal">
+                <h3 class="about-name">Eduardo Sánchez</h3>
+                <p class="about-role">Artista Plástico · Ingeniero de Minas · Project Manager</p>
+                <span class="about-location">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Lima, Perú
+                </span>
+                <p class="about-text">
+                    Artista multidisciplinario, Ingeniero de Minas y Project Manager en <strong style="color:var(--text)">Waffles Tech</strong>, empresa enfocada en el desarrollo de videojuegos y análisis de datos. Cuenta con más de diez años de experiencia en la creación artística, trabajando en pintura, escultura y tatuaje, con una línea orientada a la construcción de un lenguaje visual propio.
+                </p>
+                <p class="about-text">
+                    Se encuentra registrado como artista en el <strong style="color:var(--text)">RENTOCA</strong> del Ministerio de Cultura del Perú, consolidando formalmente su trayectoria dentro del sector cultural.
+                </p>
+                <p class="about-text">
+                    Ha sido reconocido en la <strong style="color:var(--text)">Expo Tattoo 2019</strong>, obteniendo premios en la categoría de estilo tradicional. Su trabajo destaca por una estética influenciada por el old school en blanco y negro y por la consistencia en su propuesta visual.
+                </p>
+                <p class="about-text">
+                    En el ámbito profesional, lidera proyectos tecnológicos que integran creatividad, narrativa y análisis de datos, coordinando equipos multidisciplinarios y procesos de desarrollo digital. Cuenta además con experiencia en el sector minero en Perú, desempeñándose en entornos de alto riesgo bajo estándares SSOMA.
+                </p>
+                <p class="about-text">
+                    Actualmente desarrolla su tesis sobre <strong style="color:var(--text)">drenaje ácido de mina</strong> en la Unidad Minera Pucarrajo (Huaraz), enfocada en gestión ambiental. Es fundador de <strong style="color:var(--red)">Buena Suerte Tattoo</strong>, espacio dedicado al tatuaje como medio de expresión artística. Los gatos aparecen como un elemento recurrente dentro de su imaginario simbólico.
+                </p>
+                <div class="about-highlights">
+                    <div class="about-highlight">
+                        <div class="ah-icon">🎨</div>
+                        <h4>Arte Visual</h4>
+                        <p>Pintura, escultura y tatuaje con estética old school en blanco y negro</p>
+                    </div>
+                    <div class="about-highlight">
+                        <div class="ah-icon">💻</div>
+                        <h4>Tecnología</h4>
+                        <p>Desarrollo web, Python, análisis de datos y videojuegos en Waffles Tech</p>
+                    </div>
+                    <div class="about-highlight">
+                        <div class="ah-icon">⛏️</div>
+                        <h4>Minería</h4>
+                        <p>Ingeniería de Minas con experiencia en entornos de alto riesgo SSOMA</p>
+                    </div>
+                    <div class="about-highlight">
+                        <div class="ah-icon">🏆</div>
+                        <h4>Reconocimiento</h4>
+                        <p>Premio Expo Tattoo 2019 · Registrado RENTOCA Ministerio de Cultura</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CAROUSEL -->
+    <section class="carousel-section" id="trabajos">
+        <div class="section-head reveal">
+            <div class="section-tag">Portfolio</div>
+            <h2 class="section-title">Mis Trabajos</h2>
+            <p class="section-desc">Una selección de mis piezas más oscuras y auténticas.</p>
+        </div>
+        <div class="carousel-wrap reveal">
+            <div class="carousel-viewport">
+                <div class="carousel-track" id="cTrack">
+                    <div class="c-slide">
+                        <img src="https://image.qwenlm.ai/public_source/ee9168b3-aa94-472e-8215-e39819afeb99/15783da31-36f1-4bd6-94e0-ca2e7a3ea98f.png" alt="Trabajo 1">
+                        <div class="c-slide-overlay">
+                            <span class="c-slide-badge">Pintura Digital</span>
+                            <h3 class="c-slide-title">Fragmentos Rotos</h3>
+                            <p class="c-slide-sub">Ilustración digital · 2025</p>
+                        </div>
+                    </div>
+                    <div class="c-slide">
+                        <img src="https://image.qwenlm.ai/public_source/ee9168b3-aa94-472e-8215-e39819afeb99/115e68f77-a0d6-4348-95a7-47c49d3ec485.png" alt="Trabajo 2">
+                        <div class="c-slide-overlay">
+                            <span class="c-slide-badge">Tatuaje</span>
+                            <h3 class="c-slide-title">La Hechicera Oscura</h3>
+                            <p class="c-slide-sub">Character Design · 2025</p>
+                        </div>
+                    </div>
+                    <div class="c-slide">
+                        <img src="https://image.qwenlm.ai/public_source/ee9168b3-aa94-472e-8215-e39819afeb99/1aa6daaa2-1c7d-44c3-82d2-1259bbbd8985.png" alt="Trabajo 3">
+                        <div class="c-slide-overlay">
+                            <span class="c-slide-badge">Escultura</span>
+                            <h3 class="c-slide-title">Catedral Carmesí</h3>
+                            <p class="c-slide-sub">Environment Art · 2025</p>
+                        </div>
+                    </div>
+                    <div class="c-slide">
+                        <img src="zettafuego/tattoo3.jpg" alt="Trabajo 4">
+                        <div class="c-slide-overlay">
+                            <span class="c-slide-badge">Tattoo</span>
+                            <h3 class="c-slide-title">cats</h3>
+                            <p class="c-slide-sub">Concept Art · 2021</p>
+                        </div>
+                    </div>
+                    <div class="c-slide">
+                        <img src="zettafuego/tattoo2.jpg" alt="Trabajo 4">
+                        <div class="c-slide-overlay">
+                            <span class="c-slide-badge">Tattoo</span>
+                            <h3 class="c-slide-title">cat tattoo</h3>
+                            <p class="c-slide-sub">Tattoo Art · 2020</p>
+                        </div>
+                    </div>
+                    <div class="c-slide">
+                        <img src="zettafuego/tattoo1.jpg" alt="Trabajo 5">
+                        <div class="c-slide-overlay">
+                            <span class="c-slide-badge">Tattoo</span>
+                            <h3 class="c-slide-title">Cat tattoo</h3>
+                            <p class="c-slide-sub">Character Design · 2024</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="c-controls">
+                <button class="c-btn" id="cPrev" aria-label="Anterior">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="c-dots" id="cDots"></div>
+                <div class="c-counter">
+                    <span class="cur" id="cCur">01</span> / <span id="cTot">05</span>
+                </div>
+                <button class="c-btn" id="cNext" aria-label="Siguiente">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+            <div class="c-thumbs" id="cThumbs"></div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="services-section" id="servicios">
+        <div class="section-head reveal">
+            <div class="section-tag">Servicios</div>
+            <h2 class="section-title">Lo Que Hago</h2>
+            <p class="section-desc">Servicios multidisciplinarios que unen arte, tecnología e ingeniería.</p>
+        </div>
+        <div class="services-grid">
+            <div class="svc-card reveal">
+                <div class="svc-icon">🖊️</div>
+                <h3>Tatuaje Artístico</h3>
+                <p>Más de 10 años creando tatuajes con estética old school en blanco y negro. Estilo tradicional con propuesta visual propia.</p>
+                <div class="svc-tags">
+                    <span class="svc-tag">Old School</span>
+                    <span class="svc-tag">Black & Grey</span>
+                    <span class="svc-tag">Traditional</span>
+                </div>
+            </div>
+            <div class="svc-card reveal">
+                <div class="svc-icon">🎨</div>
+                <h3>Pintura & Escultura</h3>
+                <p>Creación de piezas artísticas originales en pintura y escultura. Construcción de un lenguaje visual propio con identidad única.</p>
+                <div class="svc-tags">
+                    <span class="svc-tag">Óleo</span>
+                    <span class="svc-tag">Acrílico</span>
+                    <span class="svc-tag">Escultura</span>
+                </div>
+            </div>
+            <div class="svc-card reveal">
+                <div class="svc-icon">🎮</div>
+                <h3>Desarrollo de Videojuegos</h3>
+                <p>Project Manager en Waffles Tech. Liderazgo de equipos multidisciplinarios, desarrollo digital y análisis de datos.</p>
+                <div class="svc-tags">
+                    <span class="svc-tag">Waffles Tech</span>
+                    <span class="svc-tag">Game Dev</span>
+                    <span class="svc-tag">Data</span>
+                </div>
+            </div>
+            <div class="svc-card reveal">
+                <div class="svc-icon">💻</div>
+                <h3>Desarrollo Web & Python</h3>
+                <p>Desarrollo web full-stack y programación en Python. Análisis de datos, automatización y soluciones tecnológicas.</p>
+                <div class="svc-tags">
+                    <span class="svc-tag">Python</span>
+                    <span class="svc-tag">Web Dev</span>
+                    <span class="svc-tag">Data Analysis</span>
+                </div>
+            </div>
+            <div class="svc-card reveal">
+                <div class="svc-icon">🎬</div>
+                <h3>Animación</h3>
+                <p>Creación de contenido animado con narrativa visual. Animación 2D/3D para proyectos artísticos y comerciales.</p>
+                <div class="svc-tags">
+                    <span class="svc-tag">2D</span>
+                    <span class="svc-tag">Motion</span>
+                    <span class="svc-tag">Storyboard</span>
+                </div>
+            </div>
+            <div class="svc-card reveal">
+                <div class="svc-icon">🏛️</div>
+                <h3>Gestión Cultural</h3>
+                <p>Gestión de proyectos culturales y artísticos. Registro RENTOCA Ministerio de Cultura. Coordinación de eventos y exposiciones.</p>
+                <div class="svc-tags">
+                    <span class="svc-tag">RENTOCA</span>
+                    <span class="svc-tag">Curaduría</span>
+                    <span class="svc-tag">Exposiciones</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="gallery-section" id="galeria">
+        <div class="section-head reveal">
+            <div class="section-tag">Galería</div>
+            <h2 class="section-title">Más Piezas</h2>
+            <p class="section-desc">Selección adicional de trabajos en pintura, tatuaje y arte digital.</p>
+        </div>
+        <div class="gallery-grid reveal">
+            <div class="gal-item" onclick="openLB(this)">
+                <img src="zettafuego/470201819_956572889650502_3848325164375742254_n.jpg" alt="Gallery 1">
+                <div class="gal-overlay"><span>ACAB Cicatrizado</span></div>
+            </div>
+            <div class="gal-item" onclick="openLB(this)">
+                <img src="zettafuego/471131391_962447005729757_218152026845521139_n.jpg" alt="Gallery 2">
+                <div class="gal-overlay"><span>Fragmentos Waffles</span></div>
+            </div>
+            <div class="gal-item" onclick="openLB(this)">
+                <img src="https://image.qwenlm.ai/public_source/ee9168b3-aa94-472e-8215-e39819afeb99/115e68f77-a0d6-4348-95a7-47c49d3ec485.png" alt="Gallery 3">
+                <div class="gal-overlay"><span>Hechicera</span></div>
+            </div>
+            <div class="gal-item" onclick="openLB(this)">
+                <img src="https://image.qwenlm.ai/public_source/ee9168b3-aa94-472e-8215-e39819afeb99/1a131a54a-11ee-4924-a91d-1234b6125031.png" alt="Gallery 4">
+                <div class="gal-overlay"><span>Ruinas Neón</span></div>
+            </div>
+            <div class="gal-item" onclick="openLB(this)">
+                <img src="zettafuego/470222787_956585662982558_4553164497656295237_n.jpg" alt="Gallery 5">
+                <div class="gal-overlay"><span>Lucas Tattoo</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox">
+        <button class="lb-close" onclick="closeLB()">✕</button>
+        <img id="lbImg" src="" alt="Preview">
+    </div>
+
+    <!-- CONTACT -->
+    <section class="contact-section" id="contacto">
+        <div class="section-head reveal">
+            <div class="section-tag">Contacto</div>
+            <h2 class="section-title">Hablemos</h2>
+            <p class="section-desc">¿Tienes un proyecto de arte, tatuaje, desarrollo o tecnología? Escríbeme.</p>
+        </div>
+        <div class="contact-wrap reveal">
+            <form class="contact-form" onsubmit="submitForm(event)">
+                <div class="fg">
+                    <label for="fname">Nombre</label>
+                    <input type="text" id="fname" placeholder="Tu nombre" required>
+                </div>
+                <div class="fg">
+                    <label for="femail">Email</label>
+                    <input type="email" id="femail" placeholder="tu@email.com" required>
+                </div>
+                <div class="fg full">
+                    <label for="fsubject">Asunto</label>
+                    <input type="text" id="fsubject" placeholder="¿Tatuaje, arte, desarrollo web...?">
+                </div>
+                <div class="fg full">
+                    <label for="fmsg">Mensaje</label>
+                    <textarea id="fmsg" placeholder="Cuéntame sobre tu proyecto..." required></textarea>
+                </div>
+                <div class="form-submit">
+                    <button type="submit" class="btn btn-fill">
+                        Enviar Mensaje
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-brand">EDUARDO<em>SÁNCHEZ</em></div>
+            <p class="footer-copy">© 2026 Eduardo Sánchez · Lima, Perú · Buena Suerte Tattoo</p>
+            <div class="footer-socials">
+                <a href="#" class="soc-link" aria-label="Instagram">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                </a>
+                <a href="#" class="soc-link" aria-label="Twitter">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16h-4.267z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
+                </a>
+                <a href="#" class="soc-link" aria-label="Behance">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 11c1.38 0 2.5-1.12 2.5-2.5S8.88 6 7.5 6H3v5h4.5zm0 2H3v5h4.5c1.38 0 2.5-1.12 2.5-2.5S8.88 13 7.5 13zM14 7h6v2h-6V7zm0 4h5.5c1.1 0 2 .9 2 2s-.9 2-2 2H14v4h7c1.66 0 3-1.34 3-3s-1.34-3-3-3H14V11z"/></svg>
+                </a>
+                <a href="#" class="soc-link" aria-label="ArtStation">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M0 17.723l2.027 3.505h.001a2.424 2.424 0 0 0 2.164 1.333h13.457l-2.792-4.838H0zm24-4.236a2.43 2.43 0 0 0-.421-1.375L14.146 2.658a2.43 2.43 0 0 0-2.123-1.231H7.927l12.171 21.138h4.178a2.433 2.433 0 0 0 2.433-2.433v-.643zM7.927 20.565H4.294L2.027 16.632 0 13.112 3.497 7.058h4.43L12.63 15.88l3.705 6.409h-4.43l-2.208-3.826z"/></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== MORPH TEXT ANIMATION =====
+        const fromText = "ZETTAFUEGO";
+        const toText = "EDUARDO SÁNCHEZ";
+        const morphLine = document.getElementById('morphLine1');
+        let morphInterval;
+
+        function createCharSpan(char, isAccent) {
+            const span = document.createElement('span');
+            span.className = 'morph-char' + (isAccent ? ' accent-char' : '');
+            if (char === ' ') {
+                span.classList.add('space-char');
+            }
+            span.textContent = char;
+            return span;
+        }
+
+        function buildLine(text, container) {
+            container.innerHTML = '';
+            const chars = text.split('');
+            const accentIndices = new Set();
+            // For EDUARDO SÁNCHEZ, accent on "EDUARDO" and "SÁNCHEZ"
+            // For ZETTAFUEGO, accent on "ZETTAFUEGO"
+            if (text === toText) {
+                // Highlight "EDUARDO" (first word) and "SÁNCHEZ" (second word)
+                // Actually let's accent the whole name
+                for (let i = 0; i < chars.length; i++) accentIndices.add(i);
+            } else {
+                for (let i = 0; i < chars.length; i++) accentIndices.add(i);
+            }
+            chars.forEach((ch, idx) => {
+                container.appendChild(createCharSpan(ch, accentIndices.has(idx)));
+            });
+        }
+
+        function animateMorph() {
+            // Phase 1: Show ZETTAFUEGO
+            buildLine(fromText, morphLine);
+            const chars1 = morphLine.querySelectorAll('.morph-char');
+            chars1.forEach((ch, i) => {
+                ch.style.opacity = '0';
+                ch.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    ch.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    ch.style.opacity = '1';
+                    ch.style.transform = 'translateY(0)';
+                }, 100 + i * 60);
+            });
+
+            // Phase 2: Wait then morph to EDUARDO SÁNCHEZ
+            setTimeout(() => {
+                const currentChars = Array.from(morphLine.querySelectorAll('.morph-char'));
+                const fromArr = fromText.split('');
+                const toArr = toText.split('');
+                const maxLen = Math.max(fromArr.length, toArr.length);
+
+                // Clear and rebuild
+                morphLine.innerHTML = '';
+
+                toArr.forEach((targetChar, i) => {
+                    const span = document.createElement('span');
+                    span.className = 'morph-char accent-char';
+                    if (targetChar === ' ') span.classList.add('space-char');
+
+                    if (i < fromArr.length) {
+                        // This position has a character to morph
+                        span.textContent = fromArr[i];
+                        span.dataset.target = targetChar;
+                    } else {
+                        // New character
+                        span.textContent = targetChar;
+                        span.classList.add('new-char');
+                        span.style.animationDelay = (i - fromArr.length) * 0.08 + 's';
+                    }
+
+                    morphLine.appendChild(span);
+                });
+
+                // Animate existing chars morphing
+                const allSpans = morphLine.querySelectorAll('.morph-char');
+                allSpans.forEach((span, i) => {
+                    if (i < fromArr.length && span.dataset.target) {
+                        span.classList.add('changing');
+                        span.style.animationDelay = i * 0.08 + 's';
+
+                        setTimeout(() => {
+                            span.textContent = span.dataset.target;
+                            span.dataset.target = '';
+                            span.classList.remove('changing');
+                        }, 600 + i * 80);
+                    }
+                });
+
+                // Phase 3: Hold on EDUARDO SÁNCHEZ, then morph back
+                setTimeout(() => {
+                    setTimeout(() => animateMorph(), 4000);
+                }, 1000 + maxLen * 80);
+
+            }, 1500 + fromText.length * 60 + 500);
+        }
+
+        // Start the morph animation after page load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(animateMorph, 800);
+        });
+
+        // ===== NAV =====
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        const navToggle = document.getElementById('navToggle');
+        const mobileNav = document.getElementById('mobileNav');
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('open');
+            mobileNav.classList.toggle('show');
+            document.body.style.overflow = mobileNav.classList.contains('show') ? 'hidden' : '';
+        });
+        function closeMob() {
+            navToggle.classList.remove('open');
+            mobileNav.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // ===== CAROUSEL =====
+        const cTrack = document.getElementById('cTrack');
+        const cSlides = cTrack.querySelectorAll('.c-slide');
+        const cDots = document.getElementById('cDots');
+        const cThumbs = document.getElementById('cThumbs');
+        const cPrev = document.getElementById('cPrev');
+        const cNext = document.getElementById('cNext');
+        const cCur = document.getElementById('cCur');
+        const cTot = document.getElementById('cTot');
+        let cIdx = 0;
+        const cTotal = cSlides.length;
+        let cAuto;
+
+        cTot.textContent = String(cTotal).padStart(2, '0');
+
+        cSlides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'c-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', 'Slide ' + (i+1));
+            dot.addEventListener('click', () => goC(i));
+            cDots.appendChild(dot);
+
+            const thumb = document.createElement('div');
+            thumb.className = 'c-thumb' + (i === 0 ? ' active' : '');
+            const img = cSlides[i].querySelector('img');
+            thumb.innerHTML = '<img src="' + img.src + '" alt="Thumb ' + (i+1) + '">';
+            thumb.addEventListener('click', () => goC(i));
+            cThumbs.appendChild(thumb);
+        });
+
+        function goC(idx) {
+            cIdx = idx;
+            cTrack.style.transform = 'translateX(-' + (cIdx * 100) + '%)';
+            cDots.querySelectorAll('.c-dot').forEach((d, i) => d.classList.toggle('active', i === cIdx));
+            cThumbs.querySelectorAll('.c-thumb').forEach((t, i) => t.classList.toggle('active', i === cIdx));
+            cCur.textContent = String(cIdx + 1).padStart(2, '0');
+        }
+
+        cNext.addEventListener('click', () => { goC((cIdx + 1) % cTotal); resetAuto(); });
+        cPrev.addEventListener('click', () => { goC((cIdx - 1 + cTotal) % cTotal); resetAuto(); });
+
+        function startAuto() { cAuto = setInterval(() => goC((cIdx + 1) % cTotal), 5000); }
+        function resetAuto() { clearInterval(cAuto); startAuto(); }
+        startAuto();
+
+        let tStartX = 0, tEndX = 0;
+        cTrack.addEventListener('touchstart', e => { tStartX = e.changedTouches[0].screenX; }, { passive: true });
+        cTrack.addEventListener('touchend', e => {
+            tEndX = e.changedTouches[0].screenX;
+            const diff = tStartX - tEndX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) goC((cIdx + 1) % cTotal);
+                else goC((cIdx - 1 + cTotal) % cTotal);
+                resetAuto();
+            }
+        }, { passive: true });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft') { goC((cIdx - 1 + cTotal) % cTotal); resetAuto(); }
+            if (e.key === 'ArrowRight') { goC((cIdx + 1) % cTotal); resetAuto(); }
+            if (e.key === 'Escape') { closeLB(); closeMob(); }
+        });
+
+        // ===== COUNTERS =====
+        let countersDone = false;
+        function runCounters() {
+            document.querySelectorAll('.stat-num').forEach(el => {
+                const target = +el.dataset.target;
+                const dur = 2000;
+                const start = performance.now();
+                function tick(ts) {
+                    const p = Math.min((ts - start) / dur, 1);
+                    const ease = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.floor(ease * target);
+                    if (p < 1) requestAnimationFrame(tick);
+                    else el.textContent = target + '+';
+                }
+                requestAnimationFrame(tick);
+            });
+        }
+
+        // ===== SCROLL REVEAL =====
+        const revealObs = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('vis');
+                    if (entry.target.closest('.stats') && !countersDone) {
+                        countersDone = true;
+                        runCounters();
+                    }
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+        // ===== LIGHTBOX =====
+        const lightbox = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lbImg');
+        function openLB(el) {
+            lbImg.src = el.querySelector('img').src;
+            lightbox.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeLB() {
+            lightbox.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLB(); });
+
+        // ===== FORM =====
+        function submitForm(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✓ ¡Enviado!';
+            btn.style.background = 'linear-gradient(135deg, #16a34a, #15803d)';
+            setTimeout(() => {
+                btn.innerHTML = orig;
+                btn.style.background = '';
+                e.target.reset();
+            }, 3000);
+        }
+
+        // ===== SMOOTH SCROLL =====
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // ===== FIRE PARTICLES =====
+        const partContainer = document.getElementById('particles');
+        function spawnParticle() {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const heroW = document.querySelector('.hero').offsetWidth;
+            const heroH = document.querySelector('.hero').offsetHeight;
+            const x = Math.random() * heroW;
+            const y = heroH * 0.45 + Math.random() * heroH * 0.55;
+            const sz = Math.random() * 4 + 2;
+            const dur = Math.random() * 3 + 2;
+            const delay = Math.random() * 1.5;
+            const isO = Math.random() > 0.5;
+            p.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + sz + 'px;height:' + sz + 'px;background:' + (isO ? '#dd6b20' : '#e53e3e') + ';animation-duration:' + dur + 's;animation-delay:' + delay + 's;';
+            partContainer.appendChild(p);
+            setTimeout(() => p.remove(), (dur + delay) * 1000);
+        }
+        setInterval(spawnParticle, 280);
+    </script>
+</body>
+</html>
+
